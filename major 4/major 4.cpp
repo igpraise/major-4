@@ -55,3 +55,35 @@ int processFlight(char* filename, struct Flight flights[], int* total_count) {
     fclose(file);
     return 1;
 }
+void displayLeastFareDetails(struct Flight flights[], int total_count) {
+    int min_fare = flights[0].fare;
+    int index = 0;
+    for (int i = 1; i < total_count; i++) {
+        if (flights[i].fare < min_fare) {
+            min_fare = flights[i].fare;
+            index = i;
+        }
+    }
+    printf("%s: %s to %s, Fare $%d\n", flights[index].airline, flights[index].source, flights[index].destination, flights[index].fare);
+}
+
+int main() {
+    FILE* flights_file = fopen("flights.txt", "r");
+    if (flights_file == NULL) {
+        printf("Error: Could not open flights.txt\n");
+        return 1;
+    }
+    char filename[MAX_FILENAME_LENGTH];
+    struct Flight flights[MAX_FLIGHTS];
+    int total_count = 0;
+    while (fgets(filename, sizeof(filename), flights_file) != NULL) {
+        filename[strcspn(filename, "\n")] = 0; // Remove newline character
+        if (!processFlight(filename, flights, &total_count)) {
+            fclose(flights_file);
+            return 1;
+        }
+    }
+    fclose(flights_file);
+    displayLeastFareDetails(flights, total_count);
+    return 0;
+}
